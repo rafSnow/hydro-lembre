@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HydroLembre 💧
 
-## Getting Started
+HydroLembre é um Progressive Web App (PWA) offline-first para controle e incentivo da ingestão diária de água. O sistema roda inteiramente no dispositivo do usuário — sem servidor, sem banco de dados remoto, sem autenticação online.
 
-First, run the development server:
+![screenshot]
 
+## ✨ Funcionalidades
+
+- **Onboarding Personalizado:** Cálculo de meta diária baseada no seu peso ou meta manual.
+- **Registro Rápido:** Adicione água com apenas um toque usando atalhos de volume ou o botão principal.
+- **Lembretes Inteligentes:** Notificações periódicas para você não esquecer de beber água (Web Notifications API).
+- **Histórico e Gráficos:** Acompanhe seu consumo nos últimos 7 e 30 dias com visualizações claras.
+- **Estatísticas e Streaks:** Mantenha sua sequência (streak) de dias atingindo a meta e veja suas médias.
+- **Offline-First:** Funciona integralmente sem internet após a instalação.
+- **Exportação/Importação:** Backup em JSON e exportação de registros em CSV para Excel.
+- **Tema Escuro/Claro:** Suporte nativo a temas, respeitando as configurações do seu sistema.
+
+## 🚀 Stack Tecnológica
+
+- **Framework:** [Next.js 14 (App Router)](https://nextjs.org/)
+- **Persistência:** [Dexie.js](https://dexie.org/) (IndexedDB)
+- **Estilização:** [Tailwind CSS](https://tailwindcss.com/)
+- **PWA:** [next-pwa](https://github.com/shadowwalker/next-pwa) (Workbox)
+- **Ícones:** [Lucide React](https://lucide.dev/)
+- **Gráficos:** [Recharts](https://recharts.org/)
+- **Datas:** [date-fns](https://date-fns.org/)
+
+## 🛠️ Como Rodar Localmente
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/hydro-lembre.git
+   ```
+
+2. Instale as dependências:
+   ```bash
+   npm install
+   ```
+
+3. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+
+4. Abra [http://localhost:3000](http://localhost:3000) no seu navegador.
+
+## 🏗️ Build e Deploy
+
+### Build para Produção
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Deploy na Vercel
+O HydroLembre é otimizado para a [Vercel](https://vercel.com/). Você pode fazer o deploy conectando seu repositório do GitHub ou usando o CLI da Vercel:
+```bash
+vercel
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Estrutura de Diretórios Resumida
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/          # Rotas e layouts (Next.js App Router)
+├── components/   # Componentes UI e Features
+├── contexts/     # Contextos globais (Tema)
+├── hooks/        # Hooks customizados e lógica de negócio
+├── lib/          # Banco de dados, notificações e serviços
+└── styles/       # Estilos globais e Tailwind
+```
 
-## Learn More
+## 📄 Licença
 
-To learn more about Next.js, take a look at the following resources:
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Desenvolvido com 💧 por [Seu Nome]
