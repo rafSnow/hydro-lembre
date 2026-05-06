@@ -38,7 +38,7 @@ export const TodayRecordsList: React.FC<TodayRecordsListProps> = ({
         </h3>
         {hasMore && (
           <Link 
-            href={`/historico/${today()}`}
+            href={`/historico/dia?date=${today()}`}
             className="text-xs text-primary font-bold flex items-center gap-0.5 hover:underline"
           >
             Ver todos

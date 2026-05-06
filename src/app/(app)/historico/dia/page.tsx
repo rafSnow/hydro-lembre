@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { recordRepository } from '@/lib/db/repositories/recordRepository';
 import { profileRepository } from '@/lib/db/repositories/profileRepository';
@@ -17,7 +17,16 @@ import { ChevronLeft, Trash2, Edit2, Droplets } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function DayDetailPage() {
-  const { date } = useParams() as { date: string };
+  return (
+    <Suspense fallback={<div className="p-6 text-center animate-pulse">Carregando...</div>}>
+      <DayDetailContent />
+    </Suspense>
+  );
+}
+
+function DayDetailContent() {
+  const searchParams = useSearchParams();
+  const date = searchParams.get('date') || '';
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
 

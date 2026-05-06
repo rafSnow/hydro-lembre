@@ -35,7 +35,7 @@ export default function HistoryPage() {
   };
 
   const handleDayClick = (date: string) => {
-    router.push(`/historico/${date}`);
+    router.push(`/historico/dia?date=${date}`);
   };
 
   return (
