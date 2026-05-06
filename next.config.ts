@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 import withPWAInit from "@ducanh2912/next-pwa";
 
+const isProd = process.env.NODE_ENV === 'production' || process.env.GITHUB_ACTIONS === 'true';
+const basePath = isProd ? '/hydro-lembre' : '';
+
 const withPWA = withPWAInit({
   dest: "public",
   register: true,
@@ -116,12 +119,13 @@ const withPWA = withPWAInit({
     ],
   },
   fallbacks: {
-    document: "/offline",
+    document: `${basePath}/offline`,
   },
 });
 
 const nextConfig: NextConfig = {
   output: 'export',
+  basePath,
   trailingSlash: true,
   images: {
     unoptimized: true,

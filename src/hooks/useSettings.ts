@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { profileRepository } from '@/lib/db/repositories/profileRepository';
 import { settingsRepository } from '@/lib/db/repositories/settingsRepository';
@@ -17,6 +18,7 @@ import {
  * Hook para gerenciar as configurações e o perfil do usuário.
  */
 export function useSettings() {
+  const router = useRouter();
   const profile = useLiveQuery(() => profileRepository.getProfile());
   const allSettings = useLiveQuery(() => settingsRepository.getAllSettings());
 
@@ -62,7 +64,7 @@ export function useSettings() {
       await db.goals.clear();
       await db.streaks.clear();
     });
-    window.location.href = '/onboarding';
+    router.push('/onboarding');
   };
 
   /**

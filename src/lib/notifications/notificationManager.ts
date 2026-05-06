@@ -63,8 +63,8 @@ export const notificationManager = {
 
     try {
       new Notification(title, {
-        icon: '/icons/icon-192.png', // Caminho padrão dos ícones PWA
-        badge: '/icons/icon-192.png',
+        icon: 'icons/icon-192x192.png', // Caminho relativo para funcionar em subdiretórios
+        badge: 'icons/icon-192x192.png',
         ...options,
       });
       return true;
