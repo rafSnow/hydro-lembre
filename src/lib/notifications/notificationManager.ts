@@ -1,0 +1,102 @@
+/**
+ * Gerenciador de notificações para o HydroLembre.
+ * Lida com suporte do navegador, permissões e envio de notificações.
+ */
+
+export const notificationManager = {
+  /**
+   * Verifica se o navegador suporta a Notification API.
+   */
+  checkSupport(): { supported: boolean; reason?: string } {
+    if (typeof window === 'undefined') return { supported: false, reason: 'SSR' };
+
+    const isNotificationSupported = 'Notification' in window;
+    
+    if (!isNotificationSupported) {
+      if (this.isIOS()) {
+        return { 
+          supported: false, 
+          reason: 'O iOS requer que o app seja instalado na Tela de Início para suportar notificações.' 
+        };
+      }
+      return { supported: false, reason: 'Este navegador não suporta notificações.' };
+    }
+
+    return { supported: true };
+  },
+
+  /**
+   * Obtém o estado atual da permissão de notificação.
+   */
+  getPermission(): NotificationPermission | 'unsupported' {
+    const support = this.checkSupport();
+    if (!support.supported) return 'unsupported';
+    return Notification.permission;
+  },
+
+  /**
+   * Solicita permissão ao usuário para enviar notificações.
+   */
+  async requestPermission(): Promise<NotificationPermission> {
+    const support = this.checkSupport();
+    if (!support.supported) return 'denied';
+
+    try {
+      const permission = await Notification.requestPermission();
+      return permission;
+    } catch (error) {
+      console.error('Erro ao solicitar permissão de notificação:', error);
+      return 'denied';
+    }
+  },
+
+  /**
+   * Envia uma notificação se disponível e permitido.
+   */
+  sendNotification(title: string, options?: NotificationOptions): boolean {
+    const permission = this.getPermission();
+    
+    if (permission !== 'granted') {
+      console.warn('Tentativa de enviar notificação sem permissão ou suporte.');
+      return false;
+    }
+
+    try {
+      new Notification(title, {
+        icon: '/icons/icon-192.png', // Caminho padrão dos ícones PWA
+        badge: '/icons/icon-192.png',
+        ...options,
+      });
+      return true;
+    } catch (error) {
+      console.error('Erro ao enviar notificação:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Detecta se o dispositivo é iOS (iPhone, iPad, iPod).
+   */
+  isIOS(): boolean {
+    if (typeof window === 'undefined') return false;
+    
+    return (
+      /iPad|iPhone|iPod/.test(navigator.userAgent) && 
+      !(window as any).MSStream
+    );
+  },
+
+  /**
+   * Verifica se o iOS precisa de instalação na Home Screen para notificações.
+   */
+  needsHomeScreenInstall(): boolean {
+    if (!this.isIOS()) return false;
+    
+    // Se for iOS e não estiver em modo standalone (PWA instalado)
+    const isStandalone = 
+      (window.navigator as any).standalone || 
+      window.matchMedia('(display-mode: standalone)').matches;
+    
+    return !isStandalone;
+  }
+};
