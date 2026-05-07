@@ -1,32 +1,19 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Download, X, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-}
+import { usePWA } from '@/hooks/usePWA';
 
 export function InstallBanner() {
+  const { isStandalone, isIOS, canInstall, install } = usePWA();
   const [showBanner, setShowBanner] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const deferredPrompt = useRef<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
-    // Detecta iOS
-    const userAgent = window.navigator.userAgent;
-    const ios = /iPad|iPhone|iPod/.test(userAgent) && !((window as any).MSStream);
-    
-    // Verifica se já está instalado
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
-      || (window.navigator as any).standalone 
-      || (typeof document !== 'undefined' && document.referrer.includes('android-app://'));
-
-    if (isStandalone) return;
-
-    setIsIOS(ios);
+    if (isStandalone) {
+      setShowBanner(false);
+      return;
+    }
 
     // Verifica se o usuário dispensou recentemente (7 dias)
     const lastDismissed = localStorage.getItem('pwa_install_dismissed');
@@ -37,35 +24,22 @@ export function InstallBanner() {
       }
     }
 
-    // Listener para o evento de instalação do Chrome/Android
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      deferredPrompt.current = e as BeforeInstallPromptEvent;
-      // Mostra o banner após 15 segundos
-      setTimeout(() => setShowBanner(true), 15000);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Para iOS, mostramos o banner de qualquer forma pois não há evento
-    if (ios) {
-      setTimeout(() => setShowBanner(true), 20000);
+    // Mostra o banner após um delay se puder instalar ou se for iOS
+    if (canInstall || isIOS) {
+      const timer = setTimeout(() => setShowBanner(true), 15000);
+      return () => clearTimeout(timer);
     }
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
+  }, [isStandalone, canInstall, isIOS]);
 
   const handleInstall = async () => {
-    if (deferredPrompt.current) {
-      await deferredPrompt.current.prompt();
-      const { outcome } = await deferredPrompt.current.userChoice;
-      if (outcome === 'accepted') {
-        setShowBanner(false);
-      }
-      deferredPrompt.current = null;
+    if (isIOS) {
+      // No iOS apenas mostramos o banner com as instruções
+      // O botão "Instalar" não aparece para iOS no banner original,
+      // mas mantemos a lógica por segurança.
+      return;
     }
+    await install();
+    setShowBanner(false);
   };
 
   const handleDismiss = () => {
@@ -73,7 +47,7 @@ export function InstallBanner() {
     localStorage.setItem('pwa_install_dismissed', Date.now().toString());
   };
 
-  if (!showBanner) return null;
+  if (!showBanner || isStandalone) return null;
 
   return (
     <div className="fixed bottom-20 left-4 right-4 z-50 animate-slide-up">
@@ -98,7 +72,7 @@ export function InstallBanner() {
         </div>
 
         <div className="flex items-center gap-2">
-          {!isIOS && (
+          {!isIOS && canInstall && (
             <Button size="sm" onClick={handleInstall}>
               Instalar
             </Button>

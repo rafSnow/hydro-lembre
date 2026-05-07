@@ -6,7 +6,8 @@ import { RemindersSection } from '@/components/features/settings/RemindersSectio
 import { QuickVolumesSection } from '@/components/features/settings/QuickVolumesSection';
 import { AppearanceSection } from '@/components/features/settings/AppearanceSection';
 import { DataSection } from '@/components/features/settings/DataSection';
-import { User, Bell, LayoutGrid, Palette, Database, Info } from 'lucide-react';
+import { AppSection } from '@/components/features/settings/AppSection';
+import { User, Bell, LayoutGrid, Palette, Database, Info, Smartphone } from 'lucide-react';
 
 interface SettingsSectionProps {
   title: string;
@@ -49,6 +50,10 @@ export default function SettingsPage() {
 
       <SettingsSection title="Seus Dados" icon={<Database size={20} />}>
         <DataSection />
+      </SettingsSection>
+
+      <SettingsSection title="Aplicativo" icon={<Smartphone size={20} />}>
+        <AppSection />
       </SettingsSection>
 
       <SettingsSection title="Sobre" icon={<Info size={20} />}>
