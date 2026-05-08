@@ -5,10 +5,13 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const isProd = process.env.NODE_ENV === 'production' || process.env.GITHUB_ACTIONS === 'true';
+const basePath = isProd ? '/hydro-lembre' : '';
+
 export const metadata: Metadata = {
   title: "HydroLembre",
   description: "Seu companheiro offline de hidratação pessoal",
-  manifest: "/manifest.json",
+  manifest: `${basePath}/manifest.json`,
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -43,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" href={`${basePath}/icons/icon-192x192.png`} />
         <script
           dangerouslySetInnerHTML={{
             __html: `

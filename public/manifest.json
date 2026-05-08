@@ -38,8 +38,8 @@
   "shortcuts": [
     {
       "name": "Registrar Água",
-      "url": "/dashboard/",
-      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+      "url": "./dashboard/",
+      "icons": [{ "src": "./icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ]
 }
