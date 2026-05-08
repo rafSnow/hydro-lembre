@@ -43,8 +43,8 @@ export const RemindersSection: React.FC = () => {
     await updateSetting('reminders_enabled', enabled);
   };
 
-  const handleTestNotification = () => {
-    const sent = notificationManager.sendNotification('Teste do HydroLembre 💧', {
+  const handleTestNotification = async () => {
+    const sent = await notificationManager.sendNotification('Teste do HydroLembre 💧', {
       body: 'Seus lembretes estão funcionando corretamente!',
     });
     if (!sent) {

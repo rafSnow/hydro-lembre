@@ -38,24 +38,8 @@
   "shortcuts": [
     {
       "name": "Registrar Água",
-      "url": "dashboard",
-      "icons": [{ "src": "icons/icon-192x192.png", "sizes": "192x192" }]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "screenshots/mobile.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Dashboard do HydroLembre no Mobile"
-    },
-    {
-      "src": "screenshots/desktop.png",
-      "sizes": "1280x800",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Dashboard do HydroLembre no Desktop"
+      "url": "/dashboard/",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ]
 }

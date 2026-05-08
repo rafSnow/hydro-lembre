@@ -17,6 +17,7 @@ interface ReminderConfig {
 class ReminderScheduler {
   private timerId: ReturnType<typeof setInterval> | null = null;
   private config: ReminderConfig | null = null;
+  private lastNotifiedKey: string | null = null; // Chave para evitar notificações duplicadas (HH:MM)
 
   /**
    * Inicia o agendamento de lembretes.
@@ -25,14 +26,15 @@ class ReminderScheduler {
     this.stop();
     this.config = config;
 
-    // Converte minutos para milissegundos
-    const intervalMs = config.intervalMin * 60 * 1000;
-
+    // Tick a cada 30 segundos para garantir precisão e atualização do dashboard
     this.timerId = setInterval(() => {
       this.tick();
-    }, intervalMs);
+    }, 30000);
 
     console.log(`Scheduler iniciado: a cada ${config.intervalMin}min das ${config.startTime} às ${config.endTime}`);
+    
+    // Executa o primeiro tick imediatamente para atualizar estado inicial
+    this.tick();
   }
 
   /**
@@ -67,24 +69,35 @@ class ReminderScheduler {
     if (!this.config) return 0;
 
     const now = new Date();
-    const [startH, startM] = this.config.startTime.split(':').map(Number);
     const nowMin = now.getHours() * 60 + now.getMinutes();
-    const startMin = startH * 60 + startM;
+    
+    const [startH, startM] = this.config.startTime.split(':').map(Number);
+    const startMinTotal = startH * 60 + startM;
 
-    // Se ainda não chegamos no horário de início de hoje
-    if (nowMin < startMin) {
-      return startMin - nowMin;
-    }
-
-    // Se já passou do horário de fim de hoje, o próximo é amanhã no início
     const [endH, endM] = this.config.endTime.split(':').map(Number);
-    const endMin = endH * 60 + endM;
-    if (nowMin > endMin) {
-      return (24 * 60 - nowMin) + startMin;
+    const endMinTotal = endH * 60 + endM;
+
+    // Se ainda não começou hoje
+    if (nowMin < startMinTotal) {
+      return startMinTotal - nowMin;
     }
 
-    // Se estamos dentro da janela, o próximo é daqui a um intervalo
-    return this.config.intervalMin;
+    // Se já passou do horário de fim de hoje
+    if (nowMin >= endMinTotal) {
+      return (24 * 60 - nowMin) + startMinTotal;
+    }
+
+    // Se estamos na janela, calculamos o próximo slot a partir do início
+    // Ex: Início 08:00, Intervalo 30min -> Slots: 08:00, 08:30, 09:00...
+    const minutesSinceStart = nowMin - startMinTotal;
+    const nextSlotIn = this.config.intervalMin - (minutesSinceStart % this.config.intervalMin);
+    
+    // Se o próximo slot ultrapassar o horário de fim, o próximo é amanhã
+    if (nowMin + nextSlotIn > endMinTotal) {
+        return (24 * 60 - nowMin) + startMinTotal;
+    }
+
+    return nextSlotIn === 0 ? this.config.intervalMin : nextSlotIn;
   }
 
   /**
@@ -104,15 +117,30 @@ class ReminderScheduler {
   }
 
   /**
-   * Executado a cada intervalo do setInterval.
+   * Executado periodicamente.
    */
-  private tick(): void {
+  private async tick(): Promise<void> {
     if (!this.config) return;
 
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const timeKey = `${now.getHours()}:${now.getMinutes()}`;
+
     if (this.isWithinWindow(this.config.startTime, this.config.endTime)) {
-      notificationManager.sendNotification('HydroLembre 💧', {
-        body: this.config.message,
-      });
+      const [startH, startM] = this.config.startTime.split(':').map(Number);
+      const startMinTotal = startH * 60 + startM;
+      
+      const minutesSinceStart = nowMin - startMinTotal;
+      
+      // Verifica se estamos EXATAMENTE em um minuto de lembrete (múltiplo do intervalo)
+      const isReminderMinute = minutesSinceStart % this.config.intervalMin === 0;
+
+      if (isReminderMinute && this.lastNotifiedKey !== timeKey) {
+        this.lastNotifiedKey = timeKey;
+        await notificationManager.sendNotification('HydroLembre 💧', {
+          body: this.config.message,
+        });
+      }
     }
   }
 }

@@ -53,7 +53,7 @@ export const notificationManager = {
   /**
    * Envia uma notificação se disponível e permitido.
    */
-  sendNotification(title: string, options?: NotificationOptions): boolean {
+  async sendNotification(title: string, options?: NotificationOptions): Promise<boolean> {
     const permission = this.getPermission();
     
     if (permission !== 'granted') {
@@ -61,12 +61,24 @@ export const notificationManager = {
       return false;
     }
 
+    const defaultOptions: NotificationOptions = {
+      icon: '/icons/icon-192x192.png',
+      badge: '/icons/icon-192x192.png',
+      ...options,
+    };
+
     try {
-      new Notification(title, {
-        icon: 'icons/icon-192x192.png', // Caminho relativo para funcionar em subdiretórios
-        badge: 'icons/icon-192x192.png',
-        ...options,
-      });
+      // Tenta usar o Service Worker para mostrar a notificação (melhor para PWA/Android)
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        if (registration && 'showNotification' in registration) {
+          await registration.showNotification(title, defaultOptions);
+          return true;
+        }
+      }
+
+      // Fallback para a API de Notificação padrão
+      new Notification(title, defaultOptions);
       return true;
     } catch (error) {
       console.error('Erro ao enviar notificação:', error);
